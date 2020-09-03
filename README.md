@@ -20,7 +20,7 @@ Measures will be imported in Sonarqube user interface after executing sonar-scan
 
 # Examples
 
-metrics.json file :
+metrics.json file :   
 {
 	"metrics": {
 		"Metric1": {
@@ -62,10 +62,10 @@ metrics.json file :
 
 measures.json file :   
 
-{.  
+{
 	"Metric1": 5257,   
 	"Metric2": "aaaaaaaaaaaaz",   
 	"Metric3": 1200.1,   
 	"Metric4": 15,   
-	"Metric5": 30.  
+	"Metric5": 30
 }    
