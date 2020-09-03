@@ -20,46 +20,44 @@ Measures will be imported in Sonarqube user interface after executing sonar-scan
 
 # Examples
 
-metrics.json file :   
-
-{.  
-	"metrics": {.  
-		"Metric1": {.  
-			"name": "Metric 1",   
-			"type": "INT",   
-			"description":"metric 1 description",   
-			"qualitative":true.  
-		},   
-		"Metric2": {.  
-			"name": "Metric 2",   
-			"type": "STRING".  
-		},   
-		"Metric3": {.  
-			"name": "Metric 3",   
-			"type": "FLOAT",   
-			"bestValue":1500,   
-			"worstValue":500,   
-			"qualitative":true.  
-		},   
-		"Metric4": {.  
-			"name": "Metric 4",   
-			"type": "PERCENT",   
-			"domain":"Maintainability",   
-			"direction":-1,   
-			"optimizedBestValue":true,   
-			"qualitative":true.  
-		},   
-		"Metric5": {.  
-			"name": "Metric 5",   
-			"type": "PERCENT",   
-			"domain":"custom",   
-			"direction":1,   
-			"optimizedBestValue":true,   
-			"qualitative":true.  
-		}.  
-	}.  
-}.  
-
+metrics.json file :
+{
+	"metrics": {
+		"Metric1": {
+			"name": "Metric 1",
+			"type": "INT",
+			"description":"metric 1 description",
+			"qualitative":true
+		},
+		"Metric2": {
+			"name": "Metric 2",
+			"type": "STRING"
+		},
+		"Metric3": {
+			"name": "Metric 3",
+			"type": "FLOAT",
+			"bestValue":1500,
+			"worstValue":500,
+			"qualitative":true
+		},
+		"Metric4": {
+			"name": "Metric 4",
+			"type": "PERCENT",
+			"domain":"Maintainability",
+			"direction":-1,
+			"optimizedBestValue":true,
+			"qualitative":true
+		},
+		"Metric5": {
+			"name": "Metric 5",
+			"type": "PERCENT",
+			"domain":"custom",
+			"direction":1,
+			"optimizedBestValue":true,
+			"qualitative":true
+		}
+	}
+}
 
 
 measures.json file :   
