@@ -1,6 +1,0 @@
-projectKey=sonar-fpga-metrics
-serverUrl=http://localhost:9000
-serverVersion=7.9.3.33349
-dashboardUrl=http://localhost:9000/dashboard?id=sonar-fpga-metrics
-ceTaskId=AXK4t5x5jpJUwqM9QVVd
-ceTaskUrl=http://localhost:9000/api/ce/task?id=AXK4t5x5jpJUwqM9QVVd
