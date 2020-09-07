@@ -1,10 +1,6 @@
-node_modules
 .DS_Store
-yarn.lock
 target/
-node/
-.idea/
-sonar-example-plugin.iml
+.scannerwork/
 
 # Eclipse
 .classpath
