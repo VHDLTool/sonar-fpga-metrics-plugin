@@ -1,0 +1,47 @@
+{
+	"metrics": {
+		"Metric1": {
+			"name": "Metric 1",
+			"type": "FLOAT"
+		},
+		"Metric2": {
+			"name": "Metric 2",
+			"type": "INT"
+		},
+		"Metric3": {
+			"name": "Metric 3",
+			"type": "STRING"
+		},
+		"Metric4": {
+			"name": "Metric 4",
+			"type": "PERCENT",
+			"domain":"custom"
+		},
+		"Metric5": {
+			"name": "Metric 5",
+			"type": "FLOAT",
+			"domain":"custom"
+		},
+		"Metric6": {
+			"name": "Metric 6",
+			"type": "PERCENT",
+			"domain":"custom"
+		},
+		"Metric7": {
+			"name": "Metric 7",
+			"type": "MILLISEC"
+		},
+		"Metric8": {
+			"name": "Metric 8",
+			"type": "RATING"
+		},
+		"Metric9": {
+			"name": "Metric 9",
+			"type": "WORK_DUR"
+		},
+		"Metric10": {
+			"name": "Metric 10",
+			"type": "BOOL"
+		}
+	}
+}

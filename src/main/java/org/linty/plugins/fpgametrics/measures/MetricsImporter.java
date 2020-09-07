@@ -31,10 +31,8 @@ import org.sonar.api.measures.Metrics;
 import org.sonar.api.measures.Metric.ValueType;
 
 import com.google.gson.Gson;
-
-
-import java.io.FileNotFoundException;
-import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 
 public class MetricsImporter implements Metrics {
@@ -58,38 +56,32 @@ public static List<Metric> getMetricsResult(){
   @Override
   public List<Metric> getMetrics() {
 	  List<Metric> metrics = new ArrayList<>();
-	  try {
-		  //System.out.println("Working Directory = " + System.getProperty("user.dir"));
-	      Gson gson = new Gson();
-	      jsonMetrics = gson.fromJson(new FileReader(configuration.get("sonar.metrics.path").orElse("C:\\Program Files\\sonarqube-7.9.3\\format-metrics.json")), JsonMetrics.class);
-	      Iterator it = jsonMetrics.metrics().entrySet().iterator();
-	      int cnt=0;
-		  while(it.hasNext()) {
-			  cnt++;
-			  Map.Entry me = (Map.Entry)it.next();
-			  try {
-			  metrics.add(new Metric.Builder((String) me.getKey(), ((JsonMetric)me.getValue()).getName(), ValueType.valueOf(((JsonMetric)me.getValue()).getType()))
-					    .setDescription(((JsonMetric)me.getValue()).getDescription())
-		        	    .setDirection(((JsonMetric)me.getValue()).getDirection())
-		        	    .setQualitative(((JsonMetric)me.getValue()).isQualitative())
-		        	    .setDomain(((JsonMetric)me.getValue()).getDomain())
-		        	    .setWorstValue(((JsonMetric)me.getValue()).getWorstValue())
-		        	    .setBestValue(((JsonMetric)me.getValue()).getBestValue())
-		        	    .setOptimizedBestValue(((JsonMetric)me.getValue()).isOptimizedBestValue())
-		        	    .setDecimalScale(((JsonMetric)me.getValue()).getDecimalScale())
-		        	    .setDeleteHistoricalData(((JsonMetric)me.getValue()).isDeleteHistoricalData())
-		        	    .setHidden(((JsonMetric)me.getValue()).isHidden())
-		        	    .setUserManaged(((JsonMetric)me.getValue()).isUserManaged())
-		        	    .create());
-			  }catch (Exception e) {
-				  System.out.println("Metric number "+cnt+" in order of declaration has beeen ignored since it is not correctly formatted.");
-			  }
+	  Gson gson = new Gson();
+	  InputStream formatMetrics=getClass().getClassLoader().getResourceAsStream("fpgametrics/format-metrics.json");
+	  jsonMetrics = gson.fromJson(new InputStreamReader(formatMetrics), JsonMetrics.class);  
+	  Iterator it = jsonMetrics.metrics().entrySet().iterator();
+	  int cnt=0;
+	  while(it.hasNext()) {
+		  cnt++;
+		  Map.Entry me = (Map.Entry)it.next();
+		  try {
+		  metrics.add(new Metric.Builder((String) me.getKey(), ((JsonMetric)me.getValue()).getName(), ValueType.valueOf(((JsonMetric)me.getValue()).getType()))
+				    .setDescription(((JsonMetric)me.getValue()).getDescription())
+	        	    .setDirection(((JsonMetric)me.getValue()).getDirection())
+	        	    .setQualitative(((JsonMetric)me.getValue()).isQualitative())
+	        	    .setDomain(((JsonMetric)me.getValue()).getDomain())
+	        	    .setWorstValue(((JsonMetric)me.getValue()).getWorstValue())
+	        	    .setBestValue(((JsonMetric)me.getValue()).getBestValue())
+	        	    .setOptimizedBestValue(((JsonMetric)me.getValue()).isOptimizedBestValue())
+	        	    .setDecimalScale(((JsonMetric)me.getValue()).getDecimalScale())
+	        	    .setDeleteHistoricalData(((JsonMetric)me.getValue()).isDeleteHistoricalData())
+	        	    .setHidden(((JsonMetric)me.getValue()).isHidden())
+	        	    .setUserManaged(((JsonMetric)me.getValue()).isUserManaged())
+	        	    .create());
+		  }catch (Exception e) {
+			  System.out.println("Metric number "+cnt+" in order of declaration has beeen ignored since it is not correctly formatted.");
 		  }
-	      
-	    } catch (FileNotFoundException e) {
-	      System.out.println("Cannot find custom metrics JSON file");
-	      //e.printStackTrace();
-	    }
+	  }
 	metricsResult=metrics;
     return metrics;
   }

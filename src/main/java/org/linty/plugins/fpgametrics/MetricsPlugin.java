@@ -17,13 +17,9 @@
  */
 package org.linty.plugins.fpgametrics;
 
-import java.util.Arrays;
-
 import org.linty.plugins.fpgametrics.measures.MetricsImporter;
 import org.linty.plugins.fpgametrics.measures.MeasuresImporter;
 import org.sonar.api.Plugin;
-import org.sonar.api.config.PropertyDefinition;
-
 
 /**
  * This class is the entry point for all extensions. It is referenced in pom.xml.
@@ -39,15 +35,7 @@ public class MetricsPlugin implements Plugin {
 
 @Override
   public void define(Context context) {
-
     context.addExtensions(MetricsImporter.class, MeasuresImporter.class);
-
-    context.addExtensions(Arrays.asList(
-      PropertyDefinition.builder("sonar.metrics.path")
-        .name("Custom metrics file path")
-        .description("Absolute path for custom metrics JSON file")
-        .category("Sonar fpga metrics")
-        .defaultValue("C:\\Program Files\\sonarqube-7.9.3\\format-metrics.json")
-        .build()));
   }
+
 }
