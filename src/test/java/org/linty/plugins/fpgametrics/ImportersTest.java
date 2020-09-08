@@ -24,7 +24,6 @@ import org.linty.plugins.fpgametrics.measures.MeasuresImporter;
 import org.linty.plugins.fpgametrics.measures.MetricsImporter;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.measure.Measure;
-import org.sonar.api.config.internal.MapSettings;
 import org.sonar.api.internal.PluginContextImpl;
 import org.sonar.api.internal.SonarRuntimeImpl;
 import org.sonar.api.measures.Metric;
@@ -41,7 +40,7 @@ public class ImportersTest {
 
     
     @Test
-    public void execute_WithMatchingPattern_ExpectValueRegistered() throws Exception {SonarRuntimeImpl a;
+    public void execute_WithMatchingPattern_ExpectValueRegistered() throws Exception {
 
     	//Instantiating MetricsPlugin class
     
@@ -51,7 +50,7 @@ public class ImportersTest {
     	
     	//Testing MetricsImporter
     	
-        MetricsImporter metricsImporter = new MetricsImporter(new MapSettings().asConfig());
+        MetricsImporter metricsImporter = new MetricsImporter();
         List<Metric> metricsList = metricsImporter.getMetrics();
         MetricsImporter.getJsonMetrics();        
         assertEquals(10,MetricsImporter.getMetricsResult().size());

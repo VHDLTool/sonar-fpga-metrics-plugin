@@ -72,10 +72,14 @@ public class MeasuresImporter implements ProjectSensor {
 		Map<String,Object> measures = new HashMap<>();
 		try {
 			measures = gson.fromJson(new FileReader(basePath+"measures.json"), measures.getClass());
-		} catch (JsonSyntaxException | JsonIOException | FileNotFoundException e) {
+		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			//e.printStackTrace();
-			System.out.println("No measures report found in this project directory :"+basePath+"measures.json");
+			System.out.println("No measures report found in this project directory");
+		}catch (JsonSyntaxException e) {
+			System.out.println("Json measures report is not correctly formatted");
+		}catch (JsonIOException e) {
+			System.out.println("Gson IO exception");
 		}
 		if(metrics!=null) {
 			for(Metric metric:metrics) {

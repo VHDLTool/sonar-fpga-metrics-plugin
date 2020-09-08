@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.linty.plugins.fpgametrics.gsondata.JsonMetric;
 import org.linty.plugins.fpgametrics.gsondata.JsonMetrics;
-import org.sonar.api.config.Configuration;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metrics;
 import org.sonar.api.measures.Metric.ValueType;
@@ -36,12 +35,8 @@ import java.io.InputStreamReader;
 
 
 public class MetricsImporter implements Metrics {
-	
-	private Configuration configuration;
-	
-	public MetricsImporter(Configuration configuration) {
-		this.configuration=configuration;
-	}
+		
+public MetricsImporter() {}
   
 private static JsonMetrics jsonMetrics;
 private static List<Metric> metricsResult;
@@ -79,7 +74,7 @@ public static List<Metric> getMetricsResult(){
 	        	    .setUserManaged(((JsonMetric)me.getValue()).isUserManaged())
 	        	    .create());
 		  }catch (Exception e) {
-			  System.out.println("Metric number "+cnt+" in order of declaration has beeen ignored since it is not correctly formatted.");
+			  System.out.println("Metric number "+cnt+" in order of declaration has been ignored since it is not correctly formatted.");
 		  }
 	  }
 	metricsResult=metrics;

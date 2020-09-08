@@ -1,6 +1,7 @@
 .DS_Store
 target/
 .scannerwork/
+sonar-project.properties
 
 # Eclipse
 .classpath

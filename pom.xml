@@ -105,7 +105,7 @@
         <version>1.18.0.372</version>
         <extensions>true</extensions>
         <configuration>
-          <pluginKey>example</pluginKey>
+          <pluginKey>fpgametrics</pluginKey>
           <pluginClass>org.linty.plugins.fpgametrics.MetricsPlugin</pluginClass>
         </configuration>
       </plugin>
