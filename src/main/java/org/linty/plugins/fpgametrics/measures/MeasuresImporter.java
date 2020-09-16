@@ -23,11 +23,12 @@ import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.scanner.sensor.ProjectSensor;
+import org.sonar.api.utils.log.Logger;
+import org.sonar.api.utils.log.Loggers;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
-
 
 import org.sonar.api.config.Configuration;
 import java.io.FileNotFoundException;
@@ -40,6 +41,8 @@ import org.apache.commons.io.FilenameUtils;
 
 
 public class MeasuresImporter implements ProjectSensor {
+	
+	private static final Logger LOG = Loggers.get(MeasuresImporter.class);
 	
 	private List<Metric> metrics=null;
 	
@@ -73,13 +76,11 @@ public class MeasuresImporter implements ProjectSensor {
 		try {
 			measures = gson.fromJson(new FileReader(basePath+"measures.json"), measures.getClass());
 		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			//e.printStackTrace();
-			System.out.println("No measures report found in this project directory");
+			LOG.warn("No measures report found in this project directory");
 		}catch (JsonSyntaxException e) {
-			System.out.println("Json measures report is not correctly formatted");
+			LOG.warn("Json measures report is not correctly formatted");
 		}catch (JsonIOException e) {
-			System.out.println("Gson IO exception");
+			LOG.warn("Gson IO exception");
 		}
 		if(metrics!=null) {
 			for(Metric metric:metrics) {
@@ -92,14 +93,16 @@ public class MeasuresImporter implements ProjectSensor {
 						Map<String,Object> measuresFile = new HashMap<>();
 						try {
 							measuresFile = gsonFile.fromJson(new FileReader(FilenameUtils.removeExtension(file.absolutePath())+"_measures.json"), measuresFile.getClass());
-						} catch (JsonSyntaxException | JsonIOException | FileNotFoundException e) {
-							// TODO Auto-generated catch block
-							//e.printStackTrace();
+						} catch (FileNotFoundException e) {}
+						catch (JsonSyntaxException e) {
+							LOG.warn("Json measures report is not correctly formatted");
+						}catch (JsonIOException e) {
+							LOG.warn("Gson IO exception");
 						}
 						
-					  Object rawValue = measuresFile.get(metric.getKey());
-					  Double ratioMax = null;
-					  if(rawValue!=null&&rawValue.getClass().isArray()) {
+						Object rawValue = measures.get(metric.getKey());
+						Double ratioMax = null;
+						if(rawValue!=null&&rawValue.getClass().equals(ArrayList.class)) {
 							if (((ArrayList) rawValue).size()==2) {
 								ratioMax=(Double) ((ArrayList) rawValue).get(1);
 								rawValue=((ArrayList) rawValue).get(0);
@@ -116,15 +119,15 @@ public class MeasuresImporter implements ProjectSensor {
 								break;
 							case "FLOAT":
 								if(ratioMax==null)
-									context.newMeasure().forMetric(metric).on(context.project()).withValue((Double) rawValue).save();
+									context.newMeasure().forMetric(metric).on(file).withValue((Double) rawValue).save();
 								else
-									context.newMeasure().forMetric(metric).on(context.project()).withValue(((Double) rawValue)/ratioMax).save();
+									context.newMeasure().forMetric(metric).on(file).withValue(((Double) rawValue)/ratioMax).save();
 								break;
 							case "PERCENT":
 								if(ratioMax==null)
-									context.newMeasure().forMetric(metric).on(context.project()).withValue((Double) rawValue).save();
+									context.newMeasure().forMetric(metric).on(file).withValue((Double) rawValue).save();
 								else
-									context.newMeasure().forMetric(metric).on(context.project()).withValue(((Double) rawValue)*100.0/ratioMax).save();
+									context.newMeasure().forMetric(metric).on(file).withValue(((Double) rawValue)*100.0/ratioMax).save();
 								break;
 							case "BOOL":
 								context.newMeasure().forMetric(metric).on(file).withValue((Boolean) rawValue).save();
