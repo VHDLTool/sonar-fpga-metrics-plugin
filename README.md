@@ -10,9 +10,8 @@ Copy the generated jar file from /target to "Sonarqube server path"/extensions/p
 
 # Usage
 
-All custom metrics should be defined in a unique 'metrics.json' file.   
-The absolute path to this file can be defined in Sonarqube web interface, in the plugin's properties (Administration tab).   
-Sonarqube server needs to be restarted when this file is modified, in order for the changes to apply.   
+All custom metrics should be defined in a unique 'formatmetrics.json' file.   
+By default src/main/resources/fpgametrics/fomatmetrics.json is used to define the list of metrics.
 Measures for each custom metric should be defined in a file named 'measures.json' at the root of the analyzed project, when they relate to a project.
 When measures relate to a single file, they should be in a json file named [Source file name without extension]_measures.json, in the same folder as the corresponding file.    
 Measures will be imported in Sonarqube user interface after executing sonar-scanner. When a measure is not provided for a metric, this one is not displayed in Sonarqube user interface.
@@ -20,7 +19,7 @@ Measures will be imported in Sonarqube user interface after executing sonar-scan
 
 # Examples
 
-metrics.json file :   
+formatmetrics.json file :   
 {
 	"metrics": {
 		"Metric1": {
