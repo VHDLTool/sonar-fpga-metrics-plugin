@@ -30,17 +30,13 @@ metrics.json file :
 			"qualitative":true
 		},
 		"Metric2": {
-			"name": "Metric 2",
-			"type": "STRING"
-		},
-		"Metric3": {
 			"name": "Metric 3",
 			"type": "FLOAT",
 			"bestValue":1500,
 			"worstValue":500,
 			"qualitative":true
 		},
-		"Metric4": {
+		"Metric3": {
 			"name": "Metric 4",
 			"type": "PERCENT",
 			"domain":"Maintainability",
@@ -48,7 +44,7 @@ metrics.json file :
 			"optimizedBestValue":true,
 			"qualitative":true
 		},
-		"Metric5": {
+		"Metric4": {
 			"name": "Metric 5",
 			"type": "PERCENT",
 			"domain":"custom",
@@ -63,9 +59,8 @@ metrics.json file :
 measures.json file :   
 
 {
-	"Metric1": 5257,   
-	"Metric2": "aaaaaaaaaaaaz",   
-	"Metric3": 1200.1,   
-	"Metric4": 15,   
-	"Metric5": 30
+	"Metric1": 5257,     
+	"Metric2": 1200.1,   
+	"Metric3": 15,   
+	"Metric4": 30
 }    
