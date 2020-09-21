@@ -5,7 +5,7 @@ A SonarQube plugin allowing to create custom metrics and assign them values from
 # Building and installing  
 
 Build the plugin with :   
-mvn clean package.  
+mvn clean package  
 Copy the generated jar file from /target to "Sonarqube server path"/extensions/plugins , then launch Sonarqube.   
 
 # Usage
