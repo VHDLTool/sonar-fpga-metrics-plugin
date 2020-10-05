@@ -5,7 +5,7 @@
   <groupId>org.linty.plugins.fpgametrics</groupId>
   <artifactId>sonar-fpga-metrics-plugin</artifactId>
   <packaging>sonar-plugin</packaging>
-  <version>1.0</version>
+  <version>1.1</version>
 
   <name>Custom metrics plugin for Sonarqube</name>
   <description>Custom metrics plugin for Sonarqube</description>
