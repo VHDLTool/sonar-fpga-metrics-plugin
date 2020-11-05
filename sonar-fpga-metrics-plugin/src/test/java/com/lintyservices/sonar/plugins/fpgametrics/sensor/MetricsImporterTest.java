@@ -17,9 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.lintyservices.sonar.plugins.fpgametrics;
+package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
-import com.lintyservices.sonar.plugins.fpgametrics.measures.MetricsImporter;
 import org.junit.Test;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.ValueType;
@@ -32,13 +31,11 @@ public class MetricsImporterTest {
 
   @Test
   public void test() {
-    MetricsImporter metricsImporter = new MetricsImporter();
-    List<Metric> metricsList = metricsImporter.getMetrics();
-    MetricsImporter.getJsonMetrics();
-    assertEquals(116, MetricsImporter.getMetricsResult().size());
-    assertEquals("NX logs remarks count", MetricsImporter.getMetricsResult().get(0).getName());
-    assertEquals(ValueType.INT, MetricsImporter.getMetricsResult().get(1).getType());
-    assertEquals(false, MetricsImporter.getMetricsResult().get(2).getQualitative());
-
+    List<Metric> metrics = new MetricsImporter().getMetrics();
+    assertEquals(116, metrics.size());
+    assertEquals("NX logs remarks count", metrics.get(0).getName());
+    assertEquals(ValueType.INT, metrics.get(1).getType());
+    assertEquals(false, metrics.get(2).getQualitative());
+    // TODO: Add more checks
   }
 }

@@ -17,10 +17,8 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package com.lintyservices.sonar.plugins.fpgametrics;
+package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
-import com.lintyservices.sonar.plugins.fpgametrics.measures.MeasuresImporter;
-import com.lintyservices.sonar.plugins.fpgametrics.measures.MetricsImporter;
 import org.junit.Test;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.measure.Measure;
@@ -33,19 +31,24 @@ import static org.junit.Assert.assertEquals;
 
 public class MeasuresImporterTest {
 
+  private static final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/ctx"));
+
   @Test
-  public void test() {
-    MetricsImporter metricsImporter = new MetricsImporter();
-    List<Metric> metricsList = metricsImporter.getMetrics();
-    final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/ctx")); //Blank file only used for context simulation
-    MeasuresImporter measuresImporter = new MeasuresImporter(metricsList, "src/test/files/");
+  public void should_succeed_with_existing_file() {
+    List<Metric> metrics = new MetricsImporter().getMetrics();
+    MeasuresImporter measuresImporter = new MeasuresImporter(metrics, "src/test/files/");
     measuresImporter.execute(contextTester);
-    final Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
-    final Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
+    Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
+    Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
     assertEquals((Integer) 1, intMeasure.value());
     assertEquals((Double) 54.385, floatMeasure.value());
+    // TODO: Add more checks
+  }
 
-    measuresImporter = new MeasuresImporter(null, "src/test/files_folder_does_not_exist/");
+  @Test
+  public void should_throw_a_warning_with_non_existing_file() {
+    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/files_folder_does_not_exist/");
     measuresImporter.execute(contextTester);
+    // TODO: Add check on exception if we decide to go to exception. Otherwise try to capture warning message.
   }
 }

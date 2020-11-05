@@ -19,14 +19,30 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics;
 
-import com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter;
-import com.lintyservices.sonar.plugins.fpgametrics.sensor.MetricsImporter;
+import org.junit.Test;
 import org.sonar.api.Plugin;
+import org.sonar.api.SonarEdition;
+import org.sonar.api.SonarQubeSide;
+import org.sonar.api.SonarRuntime;
+import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.api.utils.Version;
 
-public class FPGAMetricsPlugin implements Plugin {
+import static org.assertj.core.api.Assertions.assertThat;
 
-  @Override
-  public void define(Context context) {
-    context.addExtensions(MetricsImporter.class, MeasuresImporter.class);
+public class FPGAMetricsPluginTest {
+
+  public static final Version LTS_VERSION = Version.create(7, 9);
+  private static final int EXTENSIONS = 2;
+
+  @Test
+  public void should_contain_the_right_number_of_extensions() {
+    Plugin.Context context = setupContext(SonarRuntimeImpl.forSonarQube(LTS_VERSION, SonarQubeSide.SERVER, SonarEdition.COMMUNITY));
+    assertThat(context.getExtensions()).hasSize(EXTENSIONS);
+  }
+
+  private Plugin.Context setupContext(SonarRuntime runtime) {
+    Plugin.Context context = new Plugin.Context(runtime);
+    new FPGAMetricsPlugin().define(context);
+    return context;
   }
 }
