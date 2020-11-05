@@ -19,38 +19,19 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics;
 
-
-import com.lintyservices.sonar.plugins.fpgametrics.measures.MeasuresImporter;
 import com.lintyservices.sonar.plugins.fpgametrics.measures.MetricsImporter;
 import org.junit.Test;
-import org.sonar.api.batch.sensor.internal.SensorContextTester;
-import org.sonar.api.batch.sensor.measure.Measure;
-import org.sonar.api.internal.PluginContextImpl;
-import org.sonar.api.internal.SonarRuntimeImpl;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.ValueType;
-import org.sonar.api.utils.Version;
 
-import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
-
-public class ImportersTest {
-
+public class MetricsImporterTest {
 
   @Test
-  public void execute_WithMatchingPattern_ExpectValueRegistered() throws Exception {
-
-    //Instantiating MetricsPlugin class
-
-    MetricsPlugin metricsPlugin = new MetricsPlugin();
-    metricsPlugin.define((new PluginContextImpl.Builder().setSonarRuntime(SonarRuntimeImpl.forSonarLint(Version.parse("1.1.1")))).build());
-
-
-    //Testing MetricsImporter
-
+  public void test() {
     MetricsImporter metricsImporter = new MetricsImporter();
     List<Metric> metricsList = metricsImporter.getMetrics();
     MetricsImporter.getJsonMetrics();
@@ -59,20 +40,5 @@ public class ImportersTest {
     assertEquals(ValueType.INT, MetricsImporter.getMetricsResult().get(1).getType());
     assertEquals(false, MetricsImporter.getMetricsResult().get(2).getQualitative());
 
-
-    //Testing MeasuresImporter
-
-    final SensorContextTester contextTester = SensorContextTester.create(new File("src\\test\\files\\ctx")); //Blank file only used for context simulation
-    MeasuresImporter measuresImporter = new MeasuresImporter(metricsList, "src\\test\\files\\");
-    measuresImporter.execute(contextTester);
-    final Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
-    final Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
-    assertEquals((Integer) 1, intMeasure.value());
-    assertEquals((Double) 54.385, floatMeasure.value());
-
-    measuresImporter = new MeasuresImporter(null, "src\\test\\files_folder_does_not_exist\\");
-    measuresImporter.execute(contextTester);
   }
-
-
 }
