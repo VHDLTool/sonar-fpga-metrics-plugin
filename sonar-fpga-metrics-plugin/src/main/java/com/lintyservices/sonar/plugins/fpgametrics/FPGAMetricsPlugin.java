@@ -17,22 +17,16 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-
 package com.lintyservices.sonar.plugins.fpgametrics;
 
 import com.lintyservices.sonar.plugins.fpgametrics.measures.MeasuresImporter;
 import com.lintyservices.sonar.plugins.fpgametrics.measures.MetricsImporter;
 import org.sonar.api.Plugin;
 
-/**
- * This class is the entry point for all extensions. It is referenced in pom.xml.
- */
-
-
-public class MetricsPlugin implements Plugin {
+public class FPGAMetricsPlugin implements Plugin {
 
   //For testing only
-  public MetricsPlugin() {
+  public FPGAMetricsPlugin() {
     super();
   }
 
