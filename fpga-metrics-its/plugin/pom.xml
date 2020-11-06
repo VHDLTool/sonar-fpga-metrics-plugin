@@ -10,7 +10,7 @@
   </parent>
 
   <artifactId>fpga-metrics-its-plugin</artifactId>
-  <name>SonarQube Linty FPGA Metricxs :: Integration Tests :: Plugin</name>
+  <name>SonarQube Linty FPGA Metrics :: Integration Tests :: Plugin</name>
 
   <properties>
     <surefire.argLine>-server</surefire.argLine>
