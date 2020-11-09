@@ -19,9 +19,7 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.measure.Measure;
 import org.sonar.api.measures.Metric;
@@ -30,11 +28,9 @@ import java.io.File;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThrows;
 
 public class MeasuresImporterTest {
-
-  @Rule
-  public ExpectedException exceptionRule = ExpectedException.none();
 
   private static final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/measures/ctx"));
 
@@ -45,6 +41,7 @@ public class MeasuresImporterTest {
     measuresImporter.execute(contextTester);
     Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
     Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
+
     assertEquals((Integer) 1, intMeasure.value());
     assertEquals((Double) 54.385, floatMeasure.value());
     // TODO: Add more checks for any type of data
@@ -59,9 +56,11 @@ public class MeasuresImporterTest {
 
   @Test
   public void should_throw_an_exception_with_an_invalid_json_file() {
-    exceptionRule.expect(IllegalStateException.class);
-    exceptionRule.expectMessage("[FPGA Metrics] Cannot parse JSON report");
+    Exception thrown = assertThrows(IllegalStateException.class, this::loadMeasuresFromInvalidFile);
+    assertEquals("[FPGA Metrics] Cannot parse JSON report", thrown.getMessage());
+  }
 
+  private void loadMeasuresFromInvalidFile() {
     MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/files/measures/invalid/");
     measuresImporter.execute(contextTester);
   }
