@@ -19,16 +19,16 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.lintyservices.sonar.plugins.fpgametrics.gsondata.JsonMetric;
 import com.lintyservices.sonar.plugins.fpgametrics.gsondata.JsonMetrics;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.measures.Metric.ValueType;
 import org.sonar.api.measures.Metrics;
-import org.sonar.api.utils.log.Logger;
-import org.sonar.api.utils.log.Loggers;
 
-import java.io.InputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -36,19 +36,34 @@ import java.util.Map;
 
 public class MetricsImporter implements Metrics {
 
-  private static final Logger LOG = Loggers.get(MetricsImporter.class);
-
   @Override
   public List<Metric> getMetrics() {
-    List<Metric> metrics = new ArrayList<>();
-    InputStream formatMetrics = getClass().getClassLoader().getResourceAsStream("fpgametrics/format-metrics.json");
-    JsonMetrics jsonMetrics = new Gson().fromJson(new InputStreamReader(formatMetrics), JsonMetrics.class);
+    return getMetricsFromJsonFile("fpgametrics/format-metrics.json", "production");
+  }
 
+  @VisibleForTesting
+  List<Metric> getMetricsFromJsonFile(String jsonFilePath, String type) {
+    InputStreamReader inputStreamReader;
+    if ("test".equals(type)) {
+      try {
+        inputStreamReader = new FileReader(jsonFilePath);
+      } catch (FileNotFoundException e) {
+        throw new IllegalStateException("[FPGA] Cannot find JSON metrics file", e);
+      }
+    } else {
+      inputStreamReader = new InputStreamReader(getClass().getClassLoader().getResourceAsStream(jsonFilePath));
+    }
+    JsonMetrics jsonMetrics = new Gson().fromJson(
+      inputStreamReader,
+      JsonMetrics.class
+    );
+
+    List<Metric> metrics = new ArrayList<>();
     for (Map.Entry<String, JsonMetric> metric : jsonMetrics.metrics().entrySet()) {
       try {
         metrics.add(convertToSonarQubeMetric(metric));
       } catch (Exception e) {
-        LOG.warn(metric.getKey() + "metric has been ignored since it is not properly formatted.");
+        throw new IllegalStateException("[FPGA Metrics] " + metric.getKey() + " metric cannot be created since it is not properly formatted", e);
       }
     }
     return metrics;

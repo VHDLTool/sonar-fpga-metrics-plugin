@@ -77,16 +77,10 @@ public class MeasuresImporter implements ProjectSensor {
     try {
       return new Gson().fromJson(new FileReader(basePath + "measures.json"), Map.class);
     } catch (FileNotFoundException e) {
-      LOG.warn("No FPGA measures report found in this project directory");
+      LOG.info("[FPGA Metrics] No FPGA report found in this project directory");
       return Collections.emptyMap();
-    } catch (JsonSyntaxException e) {
-      // TODO: Why don't we make it crash in this case?
-      LOG.warn("JSON measures report is not correctly formatted");
-      return Collections.emptyMap();
-    } catch (JsonIOException e) {
-      // TODO: Why don't we make it crash in this case?
-      LOG.warn("Gson IO exception");
-      return Collections.emptyMap();
+    } catch (JsonSyntaxException | JsonIOException e) {
+      throw new IllegalStateException("[FPGA Metrics] Cannot parse JSON report");
     }
   }
 

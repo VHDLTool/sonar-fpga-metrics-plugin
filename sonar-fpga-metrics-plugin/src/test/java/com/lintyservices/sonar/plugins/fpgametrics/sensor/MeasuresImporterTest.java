@@ -19,7 +19,9 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.measure.Measure;
 import org.sonar.api.measures.Metric;
@@ -31,24 +33,36 @@ import static org.junit.Assert.assertEquals;
 
 public class MeasuresImporterTest {
 
-  private static final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/ctx"));
+  @Rule
+  public ExpectedException exceptionRule = ExpectedException.none();
+
+  private static final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/measures/ctx"));
 
   @Test
   public void should_succeed_with_existing_file() {
     List<Metric> metrics = new MetricsImporter().getMetrics();
-    MeasuresImporter measuresImporter = new MeasuresImporter(metrics, "src/test/files/");
+    MeasuresImporter measuresImporter = new MeasuresImporter(metrics, "src/test/files/measures/valid/");
     measuresImporter.execute(contextTester);
     Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
     Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
     assertEquals((Integer) 1, intMeasure.value());
     assertEquals((Double) 54.385, floatMeasure.value());
-    // TODO: Add more checks
+    // TODO: Add more checks for any type of data
   }
 
   @Test
-  public void should_throw_a_warning_with_non_existing_file() {
-    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/files_folder_does_not_exist/");
+  public void should_log_an_info_message_stating_that_json_measures_file_does_not_exist() {
+    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/measures/does-not-exist/");
     measuresImporter.execute(contextTester);
-    // TODO: Add check on exception if we decide to go to exception. Otherwise try to capture warning message.
+    // TODO: Try to catch log message
+  }
+
+  @Test
+  public void should_throw_an_exception_with_an_invalid_json_file() {
+    exceptionRule.expect(IllegalStateException.class);
+    exceptionRule.expectMessage("[FPGA Metrics] Cannot parse JSON report");
+
+    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/files/measures/invalid/");
+    measuresImporter.execute(contextTester);
   }
 }
