@@ -97,6 +97,11 @@
         <version>2.8.6</version>
       </dependency>
       <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>29.0-jre</version>
+      </dependency>
+      <dependency>
         <groupId>org.sonarsource.orchestrator</groupId>
         <artifactId>sonar-orchestrator</artifactId>
         <version>3.30.0.2630</version>
@@ -106,6 +111,7 @@
             <artifactId>ojdbc6</artifactId>
           </exclusion>
         </exclusions>
+        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.sonarsource.sonarqube</groupId>

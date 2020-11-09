@@ -19,6 +19,7 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -46,7 +47,7 @@ public class MeasuresImporter implements ProjectSensor {
   private List<Metric> metrics;
   private String basePath;
 
-  // TODO: Add annotation VisibleForTesting
+  @VisibleForTesting
   MeasuresImporter(List<Metric> metrics, String basePath) {
     this.metrics = metrics;
     this.basePath = basePath;
