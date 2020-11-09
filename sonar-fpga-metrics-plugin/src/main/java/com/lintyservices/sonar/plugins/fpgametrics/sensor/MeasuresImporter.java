@@ -19,7 +19,6 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -40,15 +39,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-
 public class MeasuresImporter implements ProjectSensor {
 
   private static final Logger LOG = Loggers.get(MeasuresImporter.class);
   private List<Metric> metrics;
   private String basePath;
 
-  @VisibleForTesting
-  MeasuresImporter(List<Metric> metrics, String basePath) {
+  public MeasuresImporter() {
+    // Required. Otherwise it throws:
+    // org.picocontainer.injectors.AbstractInjector$UnsatisfiableDependenciesException: com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter has unsatisfied dependency 'class java.lang.String' for constructor 'public com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter(java.util.List,java.lang.String)'
+  }
+
+  public MeasuresImporter(List<Metric> metrics, String basePath) {
     this.metrics = metrics;
     this.basePath = basePath;
   }
