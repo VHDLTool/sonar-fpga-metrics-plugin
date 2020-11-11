@@ -48,7 +48,7 @@ public class MetricsImporter implements Metrics {
       try {
         inputStreamReader = new FileReader(jsonFilePath);
       } catch (FileNotFoundException e) {
-        throw new IllegalStateException("[FPGA] Cannot find JSON metrics file", e);
+        throw new IllegalStateException("[FPGA Metrics] Cannot find JSON metrics file", e);
       }
     } else {
       inputStreamReader = new InputStreamReader(getClass().getClassLoader().getResourceAsStream(jsonFilePath));
@@ -63,7 +63,8 @@ public class MetricsImporter implements Metrics {
       try {
         metrics.add(convertToSonarQubeMetric(metric));
       } catch (Exception e) {
-        throw new IllegalStateException("[FPGA Metrics] " + metric.getKey() + " metric cannot be created since it is not properly formatted", e);
+        throw new IllegalStateException("[FPGA Metrics] " + metric.getKey()
+          + " metric cannot be created since it is not properly formatted", e);
       }
     }
     return metrics;
