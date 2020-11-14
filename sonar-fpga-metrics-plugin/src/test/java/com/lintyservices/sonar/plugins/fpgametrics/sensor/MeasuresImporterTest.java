@@ -32,11 +32,13 @@ import static org.junit.Assert.assertThrows;
 
 public class MeasuresImporterTest {
 
+  private final List<Metric> metrics = new MetricsImporter().getMetrics();
+
   @Test
   public void should_properly_load_project_measures() {
     SensorContextTester contextTester = loadMeasuresFromFile(
       "src/test/files/measures/valid/",
-      new MetricsImporter().getMetrics()
+      metrics
     );
 
     Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
@@ -55,7 +57,7 @@ public class MeasuresImporterTest {
 
   @Test
   public void should_log_an_info_message_stating_that_json_measures_file_does_not_exist() {
-    loadMeasuresFromFile("src/test/files/measures/does-not-exist/", null);
+    loadMeasuresFromFile("src/test/files/measures/does-not-exist/", metrics);
     // TODO: Try to catch log message
   }
 
@@ -63,7 +65,7 @@ public class MeasuresImporterTest {
   public void should_throw_an_exception_with_an_invalid_json_file() {
     Exception thrown = assertThrows(
       IllegalStateException.class,
-      () -> loadMeasuresFromFile("src/test/files/measures/invalid/", null)
+      () -> loadMeasuresFromFile("src/test/files/measures/invalid/", metrics)
     );
     assertEquals("[FPGA Metrics] Cannot parse JSON measures report: measures.json", thrown.getMessage());
   }
@@ -72,7 +74,7 @@ public class MeasuresImporterTest {
   public void should_throw_an_exception_while_an_unknown_metric_is_found_in_measures_json_file() {
     Exception thrown = assertThrows(
       IllegalStateException.class,
-      () -> loadMeasuresFromFile("src/test/files/measures/unknown-metric/", null)
+      () -> loadMeasuresFromFile("src/test/files/measures/unknown-metric/", metrics)
     );
     assertEquals("[FPGA Metrics] Metric with 'UNKNOWN_METRIC' key cannot be found", thrown.getMessage());
   }

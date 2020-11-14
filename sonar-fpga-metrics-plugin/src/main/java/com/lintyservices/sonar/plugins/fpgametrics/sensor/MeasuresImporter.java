@@ -19,6 +19,7 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
@@ -43,7 +44,7 @@ import java.util.Map;
 public class MeasuresImporter implements ProjectSensor {
 
   private static final Logger LOG = Loggers.get(MeasuresImporter.class);
-  private List<Metric> metrics;
+  private Map<String, Metric> metrics;
 
   // For testing purpose only
   private String basePath;
@@ -53,8 +54,8 @@ public class MeasuresImporter implements ProjectSensor {
     // org.picocontainer.injectors.AbstractInjector$UnsatisfiableDependenciesException: com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter has unsatisfied dependency 'class java.lang.String' for constructor 'public com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter(java.util.List,java.lang.String)'
   }
 
-  public MeasuresImporter(List<Metric> metrics, String basePath) {
-    this.metrics = metrics;
+  public MeasuresImporter(List<Metric> metricsAsList, String basePath) {
+    this.metrics = Maps.uniqueIndex(metricsAsList, Metric::getKey);
     this.basePath = basePath;
   }
 
@@ -65,7 +66,7 @@ public class MeasuresImporter implements ProjectSensor {
 
   @Override
   public void execute(SensorContext context) {
-    metrics = new MetricsImporter().getMetrics();
+    metrics = Maps.uniqueIndex(new MetricsImporter().getMetrics(), Metric::getKey);
 
     addAllMeasuresToProject(context);
 
@@ -129,14 +130,12 @@ public class MeasuresImporter implements ProjectSensor {
     return null;
   }
 
-  // TODO: transform list to map
   private Metric getMetricFromKey(String metricKey) {
-    for (Metric metric : metrics) {
-      if (metricKey.equals(metric.getKey())) {
-        return metric;
-      }
+    Metric metric = metrics.get(metricKey);
+    if (metric == null) {
+      throw new IllegalStateException("[FPGA Metrics] Metric with '" + metricKey + "' key cannot be found");
     }
-    throw new IllegalStateException("[FPGA Metrics] Metric with '" + metricKey + "' key cannot be found");
+    return metric;
   }
 
   private Serializable getTypedMeasure(String metricType, Object measureValue, Double ratioMax) {
