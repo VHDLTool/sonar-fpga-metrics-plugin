@@ -47,7 +47,7 @@ public class MeasuresImporter implements ProjectSensor {
   private Map<String, Metric> metrics;
 
   // For testing purpose only
-  private String basePath;
+  private String basePath = "";
 
   public MeasuresImporter() {
     // Required. Otherwise it throws:
@@ -71,7 +71,10 @@ public class MeasuresImporter implements ProjectSensor {
     addAllMeasuresToProject(context);
 
     FileSystem fs = context.fileSystem();
-    Iterable<InputFile> files = fs.inputFiles(fs.predicates().hasType(InputFile.Type.MAIN));
+    Iterable<InputFile> files = fs.inputFiles(fs.predicates().and(
+      fs.predicates().hasLanguage("vhdl"),
+      fs.predicates().hasType(InputFile.Type.MAIN)
+    ));
     for (InputFile file : files) {
       addAllMeasuresToFile(context, file);
     }
