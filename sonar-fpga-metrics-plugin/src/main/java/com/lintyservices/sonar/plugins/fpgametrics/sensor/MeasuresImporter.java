@@ -19,9 +19,11 @@
  */
 package com.lintyservices.sonar.plugins.fpgametrics.sensor;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
+import org.apache.commons.io.FilenameUtils;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -36,23 +38,18 @@ import java.io.FileReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class MeasuresImporter implements ProjectSensor {
 
   private static final Logger LOG = Loggers.get(MeasuresImporter.class);
-  private List<Metric> metrics;
+  private Map<String, Metric> metrics;
+
   private String basePath;
 
   public MeasuresImporter() {
     // Required. Otherwise it throws:
     // org.picocontainer.injectors.AbstractInjector$UnsatisfiableDependenciesException: com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter has unsatisfied dependency 'class java.lang.String' for constructor 'public com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter(java.util.List,java.lang.String)'
-  }
-
-  public MeasuresImporter(List<Metric> metrics, String basePath) {
-    this.metrics = metrics;
-    this.basePath = basePath;
   }
 
   @Override
@@ -62,102 +59,102 @@ public class MeasuresImporter implements ProjectSensor {
 
   @Override
   public void execute(SensorContext context) {
-    metrics = new MetricsImporter().getMetrics();
-    Map<String, Object> measures = getMeasuresFromJsonFile();
+    metrics = Maps.uniqueIndex(new MetricsImporter().getMetrics(), Metric::getKey);
+    basePath = context.fileSystem().baseDir().getAbsolutePath() + "/";
 
-    for (Metric metric : metrics) {
-      FileSystem fs = context.fileSystem();
-      Iterable<InputFile> files = fs.inputFiles(fs.predicates().hasType(InputFile.Type.MAIN));
-      for (InputFile file : files) {
-        addNewMeasureToFile(context, measures, file, metric);
-      }
-      addNewMeasureToProject(context, measures, metric);
+    addAllMeasuresToProject(context);
+
+    FileSystem fs = context.fileSystem();
+    Iterable<InputFile> files = fs.inputFiles(fs.predicates().and(
+      fs.predicates().hasLanguage("vhdl"),
+      fs.predicates().hasType(InputFile.Type.MAIN)
+    ));
+    for (InputFile file : files) {
+      addAllMeasuresToFile(context, file);
     }
   }
 
-  private Map<String, Object> getMeasuresFromJsonFile() {
+  private Map<String, Object> getMeasuresFromJsonFile(String filePath) {
     try {
-      return new Gson().fromJson(new FileReader(basePath + "measures.json"), Map.class);
+      return new Gson().fromJson(new FileReader(basePath + filePath), Map.class);
     } catch (FileNotFoundException e) {
-      LOG.info("[FPGA Metrics] No FPGA report found in this project directory");
+      LOG.info("[FPGA Metrics] No measures report found: " + filePath);
       return Collections.emptyMap();
     } catch (JsonSyntaxException | JsonIOException e) {
-      throw new IllegalStateException("[FPGA Metrics] Cannot parse JSON report");
+      throw new IllegalStateException("[FPGA Metrics] Cannot parse JSON measures report: " + filePath);
     }
   }
 
-  private void addNewMeasureToProject(SensorContext context, Map<String, Object> measures, Metric metric) {
-    Object rawMeasure = getRawMeasure(measures.get(metric.getKey()));
-    if (rawMeasure != null) {
-      Double ratioMax = getRatioMax(measures.get(metric.getKey()));
-      Serializable typedMeasure = getTypedMeasure(rawMeasure, metric.getType().name(), ratioMax);
-      saveMeasureOnProject(context, metric, typedMeasure);
+  private void addAllMeasuresToProject(SensorContext context) {
+    Map<String, Object> measures = getMeasuresFromJsonFile("measures.json");
+    for (Map.Entry<String, Object> measure : measures.entrySet()) {
+      addNewMeasure(context, null, getMetricFromKey(measure.getKey()), measure.getValue());
     }
   }
 
-  private void addNewMeasureToFile(SensorContext context, Map<String, Object> measures, InputFile file, Metric metric) {
-    Object rawMeasure = getRawMeasure(measures.get(metric.getKey()));
-    if (rawMeasure != null) {
-      Double ratioMax = getRatioMax(measures.get(metric.getKey()));
-      Serializable typedMeasure = getTypedMeasure(rawMeasure, metric.getType().name(), ratioMax);
-      saveMeasureOnFile(context, file, metric, typedMeasure);
+  private void addAllMeasuresToFile(SensorContext context, InputFile file) {
+    Map<String, Object> measures = getMeasuresFromJsonFile(FilenameUtils.removeExtension(file.filename()) + "_measures.json");
+    for (Map.Entry<String, Object> measure : measures.entrySet()) {
+      addNewMeasure(context, file, getMetricFromKey(measure.getKey()), measure.getValue());
     }
   }
 
-  private void saveMeasureOnProject(SensorContext context, Metric metric, Serializable measure) {
-    context.newMeasure().forMetric(metric).on(context.project()).withValue(measure).save();
+  private void addNewMeasure(SensorContext context, InputFile file, Metric metric, Object rawMeasure) {
+    Serializable measure = getTypedMeasure(
+      metric.getType().name(),
+      getMeasure(rawMeasure),
+      getRatioMax(rawMeasure)
+    );
+
+    if (file != null) {
+      context.newMeasure().forMetric(metric).on(file).withValue(measure).save();
+    } else {
+      context.newMeasure().forMetric(metric).on(context.project()).withValue(measure).save();
+    }
   }
 
-  private void saveMeasureOnFile(SensorContext context, InputFile file, Metric metric, Serializable measure) {
-    context.newMeasure().forMetric(metric).on(file).withValue(measure).save();
-  }
-
-  private Object getRawMeasure(Object rawValue) {
-    if (rawValue != null && rawValue.getClass().equals(ArrayList.class)) {
-      if (((ArrayList) rawValue).size() == 2) {
-        rawValue = ((ArrayList) rawValue).get(0);
-      } else {
-        rawValue = null;
-      }
+  private Object getMeasure(Object rawValue) {
+    if (rawValue.getClass().equals(ArrayList.class)) {
+      return ((ArrayList) rawValue).get(0);
     }
     return rawValue;
   }
 
   private Double getRatioMax(Object rawValue) {
-    if (rawValue != null && rawValue.getClass().equals(ArrayList.class) && (((ArrayList) rawValue).size() == 2)) {
+    if (rawValue.getClass().equals(ArrayList.class)) {
       return (Double) ((ArrayList) rawValue).get(1);
     }
     return null;
   }
 
-  private Serializable getTypedMeasure(Object rawValue, String metricType, Double ratioMax) {
+  private Metric getMetricFromKey(String metricKey) {
+    Metric metric = metrics.get(metricKey);
+    if (metric == null) {
+      throw new IllegalStateException("[FPGA Metrics] Metric with '" + metricKey + "' key cannot be found");
+    }
+    return metric;
+  }
+
+  private Serializable getTypedMeasure(String metricType, Object measureValue, Double ratioMax) {
     switch (metricType) {
       case "INT":
-        return (int) Math.round((Double) rawValue);
+        return (int) Math.round((Double) measureValue);
       case "FLOAT":
-        if (ratioMax == null) {
-          return (Double) rawValue;
-        } else {
-          return ((Double) rawValue) / ratioMax;
-        }
+        return (Double) measureValue;
       case "PERCENT":
-        if (ratioMax == null) {
-          return (Double) rawValue;
-        } else {
-          return ((Double) rawValue) * 100.0 / ratioMax;
-        }
+        return ((Double) measureValue) * 100.0 / ratioMax;
       case "BOOL":
-        return (Boolean) rawValue;
+        return (Boolean) measureValue;
       case "STRING":
       case "DATA":
       case "DISTRIB":
-        return (String) rawValue;
+        return (String) measureValue;
       case "MILLISEC":
       case "RATING":
       case "WORK_DUR":
-        return Math.round((Double) rawValue);
+        return Math.round((Double) measureValue);
       default:
-        throw new IllegalStateException(metricType + " metric type not recognized.");
+        throw new IllegalStateException("[FPGA Metrics] '" + metricType + "' metric type not recognized.");
     }
   }
 }

@@ -32,36 +32,54 @@ import static org.junit.Assert.assertThrows;
 
 public class MeasuresImporterTest {
 
-  private static final SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/measures/ctx"));
+  private final List<Metric> metrics = new MetricsImporter().getMetrics();
 
   @Test
-  public void should_succeed_with_existing_file() {
-    List<Metric> metrics = new MetricsImporter().getMetrics();
-    MeasuresImporter measuresImporter = new MeasuresImporter(metrics, "src/test/files/measures/valid/");
-    measuresImporter.execute(contextTester);
+  public void should_properly_load_project_measures() {
+    SensorContextTester contextTester = loadMeasuresFromPath("src/test/files/measures/valid/");
+
     Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
     Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
+    Measure<Double> percentage = contextTester.measure(contextTester.module().key(), "NX_4LUT_PERCENT");
 
-    assertEquals((Integer) 1, intMeasure.value());
-    assertEquals((Double) 54.385, floatMeasure.value());
-    // TODO: Add more checks for any type of data
+    assertEquals(Integer.valueOf(1), intMeasure.value());
+    assertEquals(Double.valueOf(54.385), floatMeasure.value());
+    assertEquals(Double.valueOf(16636.0 * 100.0 / 129024.0), percentage.value());
   }
+
+  // TODO
+  //@Test
+  //public void should_properly_load_file_measures() {
+  //}
 
   @Test
   public void should_log_an_info_message_stating_that_json_measures_file_does_not_exist() {
-    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/measures/does-not-exist/");
-    measuresImporter.execute(contextTester);
+    loadMeasuresFromPath("src/test/files/measures/does-not-exist/");
     // TODO: Try to catch log message
   }
 
   @Test
   public void should_throw_an_exception_with_an_invalid_json_file() {
-    Exception thrown = assertThrows(IllegalStateException.class, this::loadMeasuresFromInvalidFile);
-    assertEquals("[FPGA Metrics] Cannot parse JSON report", thrown.getMessage());
+    Exception thrown = assertThrows(
+      IllegalStateException.class,
+      () -> loadMeasuresFromPath("src/test/files/measures/invalid/")
+    );
+    assertEquals("[FPGA Metrics] Cannot parse JSON measures report: measures.json", thrown.getMessage());
   }
 
-  private void loadMeasuresFromInvalidFile() {
-    MeasuresImporter measuresImporter = new MeasuresImporter(null, "src/test/files/measures/invalid/");
+  @Test
+  public void should_throw_an_exception_while_an_unknown_metric_is_found_in_measures_json_file() {
+    Exception thrown = assertThrows(
+      IllegalStateException.class,
+      () -> loadMeasuresFromPath("src/test/files/measures/unknown-metric/")
+    );
+    assertEquals("[FPGA Metrics] Metric with 'UNKNOWN_METRIC' key cannot be found", thrown.getMessage());
+  }
+
+  private SensorContextTester loadMeasuresFromPath(String baseDirectoryPath) {
+    MeasuresImporter measuresImporter = new MeasuresImporter();
+    SensorContextTester contextTester = SensorContextTester.create(new File(baseDirectoryPath));
     measuresImporter.execute(contextTester);
+    return contextTester;
   }
 }
