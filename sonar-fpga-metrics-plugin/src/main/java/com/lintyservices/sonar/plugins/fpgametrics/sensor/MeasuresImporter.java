@@ -33,6 +33,7 @@ import org.sonar.api.scanner.sensor.ProjectSensor;
 import org.sonar.api.utils.log.Logger;
 import org.sonar.api.utils.log.Loggers;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.Serializable;
@@ -45,13 +46,6 @@ public class MeasuresImporter implements ProjectSensor {
   private static final Logger LOG = Loggers.get(MeasuresImporter.class);
   private Map<String, Metric> metrics;
 
-  private String basePath;
-
-  public MeasuresImporter() {
-    // Required. Otherwise it throws:
-    // org.picocontainer.injectors.AbstractInjector$UnsatisfiableDependenciesException: com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter has unsatisfied dependency 'class java.lang.String' for constructor 'public com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter(java.util.List,java.lang.String)'
-  }
-
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor.name("Import custom FPGA measures from JSON files");
@@ -60,8 +54,6 @@ public class MeasuresImporter implements ProjectSensor {
   @Override
   public void execute(SensorContext context) {
     metrics = Maps.uniqueIndex(new MetricsImporter().getMetrics(), Metric::getKey);
-    basePath = context.fileSystem().baseDir().getAbsolutePath() + "/";
-
     addAllMeasuresToProject(context);
 
     FileSystem fs = context.fileSystem();
@@ -76,7 +68,7 @@ public class MeasuresImporter implements ProjectSensor {
 
   private Map<String, Object> getMeasuresFromJsonFile(String filePath) {
     try {
-      return new Gson().fromJson(new FileReader(basePath + filePath), Map.class);
+      return new Gson().fromJson(new FileReader(filePath), Map.class);
     } catch (FileNotFoundException e) {
       LOG.info("[FPGA Metrics] No measures report found: " + filePath);
       return Collections.emptyMap();
@@ -86,14 +78,18 @@ public class MeasuresImporter implements ProjectSensor {
   }
 
   private void addAllMeasuresToProject(SensorContext context) {
-    Map<String, Object> measures = getMeasuresFromJsonFile("measures.json");
+    Map<String, Object> measures = getMeasuresFromJsonFile(context.fileSystem().baseDir().getPath() + File.separator + "measures.json");
     for (Map.Entry<String, Object> measure : measures.entrySet()) {
       addNewMeasure(context, null, getMetricFromKey(measure.getKey()), measure.getValue());
     }
   }
 
   private void addAllMeasuresToFile(SensorContext context, InputFile file) {
-    Map<String, Object> measures = getMeasuresFromJsonFile(FilenameUtils.removeExtension(file.filename()) + "_measures.json");
+    Map<String, Object> measures = getMeasuresFromJsonFile(
+      context.fileSystem().baseDir().getPath() + File.separator
+        + FilenameUtils.removeExtension(file.filename()) + "_measures.json"
+    );
+
     for (Map.Entry<String, Object> measure : measures.entrySet()) {
       addNewMeasure(context, file, getMetricFromKey(measure.getKey()), measure.getValue());
     }

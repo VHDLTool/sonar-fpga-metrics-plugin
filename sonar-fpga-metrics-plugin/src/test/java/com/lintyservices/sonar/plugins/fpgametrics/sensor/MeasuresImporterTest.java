@@ -64,7 +64,10 @@ public class MeasuresImporterTest {
       IllegalStateException.class,
       () -> loadMeasuresFromPath("src/test/files/measures/invalid/")
     );
-    assertEquals("[FPGA Metrics] Cannot parse JSON measures report: measures.json", thrown.getMessage());
+    assertEquals("[FPGA Metrics] Cannot parse JSON measures report: src"
+        + File.separator + "test" + File.separator + "files" + File.separator + "measures"
+        + File.separator + "invalid" + File.separator + "measures.json",
+      thrown.getMessage());
   }
 
   @Test
