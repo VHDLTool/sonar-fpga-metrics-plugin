@@ -36,10 +36,7 @@ public class MeasuresImporterTest {
 
   @Test
   public void should_properly_load_project_measures() {
-    SensorContextTester contextTester = loadMeasuresFromFile(
-      "src/test/files/measures/valid/",
-      metrics
-    );
+    SensorContextTester contextTester = loadMeasuresFromPath("src/test/files/measures/valid/");
 
     Measure<Integer> intMeasure = contextTester.measure(contextTester.module().key(), "NX_Log_Remarks");
     Measure<Double> floatMeasure = contextTester.measure(contextTester.module().key(), "NX_CLK1_Max_Delay");
@@ -57,7 +54,7 @@ public class MeasuresImporterTest {
 
   @Test
   public void should_log_an_info_message_stating_that_json_measures_file_does_not_exist() {
-    loadMeasuresFromFile("src/test/files/measures/does-not-exist/", metrics);
+    loadMeasuresFromPath("src/test/files/measures/does-not-exist/");
     // TODO: Try to catch log message
   }
 
@@ -65,7 +62,7 @@ public class MeasuresImporterTest {
   public void should_throw_an_exception_with_an_invalid_json_file() {
     Exception thrown = assertThrows(
       IllegalStateException.class,
-      () -> loadMeasuresFromFile("src/test/files/measures/invalid/", metrics)
+      () -> loadMeasuresFromPath("src/test/files/measures/invalid/")
     );
     assertEquals("[FPGA Metrics] Cannot parse JSON measures report: measures.json", thrown.getMessage());
   }
@@ -74,14 +71,14 @@ public class MeasuresImporterTest {
   public void should_throw_an_exception_while_an_unknown_metric_is_found_in_measures_json_file() {
     Exception thrown = assertThrows(
       IllegalStateException.class,
-      () -> loadMeasuresFromFile("src/test/files/measures/unknown-metric/", metrics)
+      () -> loadMeasuresFromPath("src/test/files/measures/unknown-metric/")
     );
     assertEquals("[FPGA Metrics] Metric with 'UNKNOWN_METRIC' key cannot be found", thrown.getMessage());
   }
 
-  private SensorContextTester loadMeasuresFromFile(String filePath, List<Metric> metrics) {
-    MeasuresImporter measuresImporter = new MeasuresImporter(metrics, filePath);
-    SensorContextTester contextTester = SensorContextTester.create(new File("src/test/files/measures/ctx"));
+  private SensorContextTester loadMeasuresFromPath(String baseDirectoryPath) {
+    MeasuresImporter measuresImporter = new MeasuresImporter();
+    SensorContextTester contextTester = SensorContextTester.create(new File(baseDirectoryPath));
     measuresImporter.execute(contextTester);
     return contextTester;
   }

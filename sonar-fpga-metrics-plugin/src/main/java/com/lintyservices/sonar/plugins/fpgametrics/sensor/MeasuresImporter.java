@@ -38,7 +38,6 @@ import java.io.FileReader;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class MeasuresImporter implements ProjectSensor {
@@ -46,17 +45,11 @@ public class MeasuresImporter implements ProjectSensor {
   private static final Logger LOG = Loggers.get(MeasuresImporter.class);
   private Map<String, Metric> metrics;
 
-  // For testing purpose only
-  private String basePath = "";
+  private String basePath;
 
   public MeasuresImporter() {
     // Required. Otherwise it throws:
     // org.picocontainer.injectors.AbstractInjector$UnsatisfiableDependenciesException: com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter has unsatisfied dependency 'class java.lang.String' for constructor 'public com.lintyservices.sonar.plugins.fpgametrics.sensor.MeasuresImporter(java.util.List,java.lang.String)'
-  }
-
-  public MeasuresImporter(List<Metric> metricsAsList, String basePath) {
-    this.metrics = Maps.uniqueIndex(metricsAsList, Metric::getKey);
-    this.basePath = basePath;
   }
 
   @Override
@@ -67,6 +60,7 @@ public class MeasuresImporter implements ProjectSensor {
   @Override
   public void execute(SensorContext context) {
     metrics = Maps.uniqueIndex(new MetricsImporter().getMetrics(), Metric::getKey);
+    basePath = context.fileSystem().baseDir().getAbsolutePath() + "/";
 
     addAllMeasuresToProject(context);
 
