@@ -1,12 +1,18 @@
-# Sonar FPGA Metrics Plugin  
+# SonarQube Linty FPGA Metrics Plugin  
 
 A SonarQube plugin allowing to create custom metrics and assign them values from external files. 
 
-# Building and installing  
+## Build Plugin
 
-Build the plugin with :   
-mvn clean package  
-Copy the generated jar file from /target to "Sonarqube server path"/extensions/plugins , then launch Sonarqube.   
+Without integration tests:
+```
+mvn clean package
+```
+
+With integration tests on SonarQube 7.9.4 version:
+```
+mvn clean verify -Pits -Dsonar.runtimeVersion=7.9.4
+```
 
 # Usage
 

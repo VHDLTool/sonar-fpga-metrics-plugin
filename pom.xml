@@ -1,84 +1,156 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.linty.plugins.fpgametrics</groupId>
-  <artifactId>sonar-fpga-metrics-plugin</artifactId>
-  <packaging>sonar-plugin</packaging>
-  <version>1.1</version>
+  <parent>
+    <groupId>org.sonarsource.parent</groupId>
+    <artifactId>parent</artifactId>
+    <version>54</version>
+  </parent>
 
-  <name>Custom metrics plugin for Sonarqube</name>
-  <description>Custom metrics plugin for Sonarqube</description>
-  <url>https://github.com/Linty-Services/sonar-coverage-ghdl</url>
-  <inceptionYear>2020</inceptionYear>
+  <groupId>com.lintyservices.sonar.plugins.fpgametrics</groupId>
+  <artifactId>parent</artifactId>
+  <packaging>pom</packaging>
+  <name>SonarQube Linty FPGA Metrics</name>
+  <version>1.2.0-SNAPSHOT</version>
+  <description>Import custom FPGA metrics</description>
+  <url>https://www.linty-services.com</url>
+
+  <modules>
+    <module>sonar-fpga-metrics-plugin</module>
+    <!--See 'its' profile to activate this module-->
+    <!--<module>fpga-metrics-its</module>-->
+  </modules>
+
+  <properties>
+    <license.owner>Linty Services</license.owner>
+    <license.mailto>mailto:contact@linty-services.com</license.mailto>
+    <sonar.version>7.9</sonar.version>
+    <sonar.host.url>https://sonar.linty-services.com</sonar.host.url>
+  </properties>
+
   <organization>
     <name>Linty Services</name>
+    <url>https://www.linty-services.com/</url>
   </organization>
+
+  <inceptionYear>2020</inceptionYear>
   <licenses>
     <license>
       <name>GNU LGPL 3</name>
       <url>http://www.gnu.org/licenses/lgpl.txt</url>
-      <distribution>repo</distribution>
     </license>
   </licenses>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <sonar.apiVersion>7.9</sonar.apiVersion>
-    <jdk.min.version>1.8</jdk.min.version>
-    <sonar.sources>src/main/java,src/main/js</sonar.sources>
-  </properties>
+  <developers>
+    <developer>
+      <id>racodond</id>
+      <name>David Racodon</name>
+      <email>david.racodon@linty-services.com</email>
+      <organization>Linty Services</organization>
+      <organizationUrl>https://www.linty-services.com</organizationUrl>
+    </developer>
+    <developer>
+      <id>louisv</id>
+      <name>Vincent Louis</name>
+      <email>vincent.louis@linty-services.com</email>
+      <organization>Linty Services</organization>
+      <organizationUrl>https://www.linty-services.com</organizationUrl>
+    </developer>
+    <developer>
+      <id>rocam</id>
+      <name>Mathias Roca</name>
+      <email>mathias.roca@linty-services.com</email>
+      <organization>Linty Services</organization>
+      <organizationUrl>https://www.linty-services.com</organizationUrl>
+    </developer>
+  </developers>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.sonarsource.sonarqube</groupId>
-      <artifactId>sonar-plugin-api</artifactId>
-      <version>${sonar.apiVersion}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-     <groupId>commons-io</groupId>
-     <artifactId>commons-io</artifactId>
-     <version>2.7</version>
- 	</dependency>
-    <dependency>
-      <!-- packaged with the plugin -->
-       <groupId>org.apache.commons</groupId>
-  	   <artifactId>commons-lang3</artifactId>
-      <version>3.10</version>
-    </dependency>
+  <scm>
+    <connection>scm:git:github.com:Linty-Services/sonar-fpga-metrics-plugin.git</connection>
+    <developerConnection>scm:git:github.com:Linty-Services/sonar-fpga-metrics-plugin.git</developerConnection>
+    <url>https://github.com/Linty-Services/sonar-fpga-metrics-plugin.git</url>
+  </scm>
 
+  <issueManagement>
+    <system>jira</system>
+    <url>https://linty-services.atlassian.net/browse/FPGAMT</url>
+  </issueManagement>
 
-    <!-- unit tests -->
-    <dependency>
-      <groupId>org.sonarsource.sonarqube</groupId>
-      <artifactId>sonar-testing-harness</artifactId>
-      <version>${sonar.apiVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-    <groupId>junit</groupId>
-    <artifactId>junit</artifactId>
-    <version>4.13</version>
-    <scope>test</scope>
-  </dependency>
-    <dependency>
-  <groupId>com.google.code.gson</groupId>
-  <artifactId>gson</artifactId>
-  <version>2.8.6</version>
-  <scope>compile</scope>
-</dependency>
-  </dependencies>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.sonarsource.sonarqube</groupId>
+        <artifactId>sonar-plugin-api</artifactId>
+        <version>${sonar.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.8.0</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.code.gson</groupId>
+        <artifactId>gson</artifactId>
+        <version>2.8.6</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.guava</groupId>
+        <artifactId>guava</artifactId>
+        <version>29.0-jre</version>
+      </dependency>
+      <dependency>
+        <groupId>org.sonarsource.orchestrator</groupId>
+        <artifactId>sonar-orchestrator</artifactId>
+        <version>3.30.0.2630</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.oracle</groupId>
+            <artifactId>ojdbc6</artifactId>
+          </exclusion>
+        </exclusions>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.sonarsource.sonarqube</groupId>
+        <artifactId>sonar-testing-harness</artifactId>
+        <version>${sonar.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.13.1</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <plugins>
-    	<plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.8.1</version>
+        <configuration>
+          <source>11</source>
+          <target>11</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+
+      <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.5</version>
+        <version>0.8.6</version>
+        <configuration>
+          <append>true</append>
+        </configuration>
         <executions>
           <execution>
-            <id>prepare-agent</id>
+            <id>agent</id>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
@@ -90,48 +162,17 @@
               <goal>report</goal>
             </goals>
           </execution>
-          <execution>
-            <id>post-unit-test</id>
-            <phase>test</phase>
-            <goals>
-              <goal>report</goal>
-            </goals>
-          </execution>
         </executions>
       </plugin>
-      <plugin>
-        <groupId>org.sonarsource.sonar-packaging-maven-plugin</groupId>
-        <artifactId>sonar-packaging-maven-plugin</artifactId>
-        <version>1.18.0.372</version>
-        <extensions>true</extensions>
-        <configuration>
-          <pluginKey>fpgametrics</pluginKey>
-          <pluginClass>org.linty.plugins.fpgametrics.MetricsPlugin</pluginClass>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.8.1</version>
-        <configuration>
-          <source>${jdk.min.version}</source>
-          <target>${jdk.min.version}</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <!-- UTF-8 bundles are not supported by Java, so they must be converted during build -->
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>native2ascii-maven-plugin</artifactId>
-        <version>2.0.1</version>
-        <executions>
-          <execution>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>     
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>its</id>
+      <modules>
+        <module>fpga-metrics-its</module>
+      </modules>
+    </profile>
+  </profiles>
 </project>

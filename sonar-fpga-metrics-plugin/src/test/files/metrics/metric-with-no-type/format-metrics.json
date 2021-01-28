@@ -1,0 +1,10 @@
+{
+  "metrics": {
+    "NX_Log_Remarks": {
+      "name": "NX logs remarks count",
+      "description": "Number of remarks in NX log dataflow",
+//    "type": "INT",
+      "domain": "NX Logs"
+    }
+  }
+}
